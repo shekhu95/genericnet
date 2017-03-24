@@ -1,0 +1,95 @@
+Screen ST_Payments:BENEFICIARY, OBNK
+    t24Name: "BENEFICIARY,OBNK"
+    metamodelVersion: "1.30.6"
+    numberOfAuthorisers: 0
+reportLocks: Yes
+
+TransactionFlow {
+    otherCompanyAccess: Yes
+}
+
+Presentation {
+    recordsPerPage: "1"
+    fieldsPerLine: "1"
+    language: en
+}
+
+Fields {
+    "BEN_ACCT_NO" {
+
+        Presentation {
+            column: 1
+            mandatory: Yes
+        }
+
+    }
+
+    "NICKNAME" {
+
+        Presentation {
+            column: 2
+            mandatory: Yes
+        }
+
+        API {
+            validation-routines:
+                jBC: "BEN.OBNK.VALIDATE"
+        }
+
+    }
+
+    "EMAIL" {
+
+        Presentation {
+            column: 3
+        }
+
+    }
+
+    "BANK_SORT_CODE" {
+
+        Presentation {
+            column: 4
+            mandatory: Yes
+        }
+
+        API {
+            validation-routines:
+                jBC: "IFSC.VALIDATE"
+        }
+
+    }
+
+    "OWNING_CUSTOMER" {
+
+        Presentation {
+            column: 5
+        }
+
+    }
+
+    "BEN_CUSTOMER" {
+
+        Presentation {
+            column: 6
+        }
+
+    }
+
+    "BC_SORT_CODE" {
+
+        Presentation {
+            column: 7
+        }
+
+    }
+
+    "NAME_1" {
+
+        Presentation {
+            column: 8
+        }
+
+    }
+
+}
