@@ -1,11 +1,14 @@
 package com.temenos.dshubhamrajput.genericnet;
 
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -21,7 +24,6 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 /**
  * Created by upriya on 06-03-2017.
  */
@@ -32,6 +34,7 @@ public class Addbeneficiary extends AppCompatActivity {
     public Intent commit;
     public static String BenID;
     public static boolean success=true;
+    ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +50,7 @@ public class Addbeneficiary extends AppCompatActivity {
         final EditText accNoCheck = (EditText) findViewById(R.id.ReenterAccNo);
         final EditText emailUser = (EditText) findViewById(R.id.Email);
         final EditText nickName = (EditText) findViewById(R.id.NickName);
-        final ImageView helpicon = (ImageView) findViewById(R.id.help_icon);
+        final ImageView helpIcon = (ImageView) findViewById(R.id.help_icon);
 
         new NewDeal().execute();
 
@@ -60,7 +63,7 @@ public class Addbeneficiary extends AppCompatActivity {
                     neft1.setChecked(false);
                     ifscTextview.setVisibility(View.INVISIBLE);
                     ifscEtext.setVisibility(View.INVISIBLE);
-                    helpicon.setVisibility(View.INVISIBLE);
+                    helpIcon.setVisibility(View.INVISIBLE);
                     intentData = "internal";
                 }
             }
@@ -74,7 +77,7 @@ public class Addbeneficiary extends AppCompatActivity {
                     withinbank1.setChecked(false);
                     ifscTextview.setVisibility(View.VISIBLE);
                     ifscEtext.setVisibility(View.VISIBLE);
-                    helpicon.setVisibility(View.VISIBLE);
+                    helpIcon.setVisibility(View.VISIBLE);
                     intentData = "external";
                 }
             }
@@ -106,9 +109,25 @@ public class Addbeneficiary extends AppCompatActivity {
             }
         });
 
-        accNoCheck.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            public void onFocusChange(View v, boolean hasFocus) {
-
+//        accNoCheck.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+//            public void onFocusChange(View v, boolean hasFocus) {
+//
+//                if (!(accNoCheck.getText().toString().equals(benAccNo.getText().toString()))) {
+//                    if (!((accNoCheck.getText().toString()).matches("")))
+//                        accNoCheck.setError("Account numbers don't match");
+//                }
+//                else if(((accNoCheck.getText().toString()).matches("")))
+//                    accNoCheck.setError("This field cannot be left blank");
+//                else
+//                    accNoCheck.setError(null);
+//
+//            }
+//
+//        });
+        accNoCheck.addTextChangedListener(new TextWatcher() {
+            // ...
+            @Override
+            public void onTextChanged(CharSequence text, int start, int count, int after) {
                 if (!(accNoCheck.getText().toString().equals(benAccNo.getText().toString()))) {
                     if (!((accNoCheck.getText().toString()).matches("")))
                         accNoCheck.setError("Account numbers don't match");
@@ -117,10 +136,20 @@ public class Addbeneficiary extends AppCompatActivity {
                     accNoCheck.setError("This field cannot be left blank");
                 else
                     accNoCheck.setError(null);
+                }
 
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                                          int after) {
+                // TODO Auto-generated method stub
             }
 
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
         });
+
 
         emailUser.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -188,6 +217,20 @@ public class Addbeneficiary extends AppCompatActivity {
         AlertDialog alert = builder.create();
         alert.show();
     }
+    public void showErrorText() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setMessage(R.string.Error_text)
+                .setTitle("ERROR")
+                .setCancelable(false)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //nothing is done
+                    }
+                });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
 
     public boolean onSupportNavigateUp() {
         finish();
@@ -201,32 +244,34 @@ public class Addbeneficiary extends AppCompatActivity {
         public String localStatus;
         @Override
         protected void onPreExecute() {
+            progressDialog= new ProgressDialog(Addbeneficiary.this);
+            progressDialog.setMessage("Please wait...");
+            progressDialog.show();
+            progressDialog.setCancelable(true);
             super.onPreExecute();
         }
 
         @Override
         protected Void doInBackground(String... param) {
-            String urlStr = "";
+            String urlStr = "",Ifsc = "",response,BencustomerNo = "",Benname = "",Name="",IfscBranch="";
             JSONObject postData = new JSONObject();
             JSONArray array = new JSONArray();
             JSONArray array1 = new JSONArray();
             JSONObject jsonObjarray = new JSONObject();
             JSONObject jsonObjarray1 = new JSONObject();
-            String BenAcctNo = param[1];
-            System.out.println(BenAcctNo);
-            String Email = param[2];
-            String Nickname = param[3];
-            String Ifsc = "",response;
-
-            localStatus= param[0];
+            Bundle benBundle = new Bundle();
             HttpHandler sh1 = new HttpHandler();
 
-            String BencustomerNo = "";
-            String Benname = "",Name="",IfscBranch="";
-            Bundle benBundle = new Bundle();
+            String BenAcctNo = param[1];
+            String Email = param[2];
+            String Nickname = param[3];
+            localStatus= param[0];
+            String OwningCustomer ="";
+
 
             // COMMON FOR BOTH
             try {
+                //CREATING JSON OBJECTING
                 postData.put("BenAcctNo", BenAcctNo);
                 postData.put("BenCustomer", BencustomerNo);
                 postData.put("BeneficiaryId", BenID);
@@ -237,25 +282,53 @@ public class Addbeneficiary extends AppCompatActivity {
                 jsonObjarray.put("Nickname", Nickname);
                 array.put(jsonObjarray);
                 postData.put("NicknameMvGroup", array);
-                postData.put("OwningCustomer", "190090");
-
-
-
+                //
+                HashMap<String,String> owner;
+                SessionManager session =new SessionManager(getApplicationContext());
+                owner=session.getUserDetails();
+                OwningCustomer= owner.get("cusId");
+                //
+                postData.put("OwningCustomer",OwningCustomer);
                 if (localStatus.equals("external")) {
                     Ifsc=param[4];
                     postData.put("BankSortCode", Ifsc);
                     benBundle.putString("Ifsc", Ifsc);
-                    urlStr = "http://10.93.22.116:9089/Test-iris/Test.svc/GB0010001/verBeneficiary_Obnks(\'" + BenID + "\')/validate";
+                    // for priya ------------- make a genral class for this logic
+                    try {
+                        String trialURl;
+                        PropertiesReader property = new PropertiesReader();
+                        trialURl= property.getProperty("url_beneficiary_Obnk_validate", getApplicationContext());
+                        String trial[] = trialURl.split("\\(");
+                        System.out.println(trial[0]);
+                        System.out.println(trial[1]);
+                        String str="'"+ BenID +"'";
+                        trial[0]=trial[0]+"(";
+                        trial[0]=trial[0]+str;
+                        urlStr  = trial[0]+trial[1];
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 } else {
-                    // get it from constant properties
-                    urlStr = "http://10.93.22.116:9089/Test-iris/Test.svc/GB0010001/verBeneficiary_Wbnks(\'" + BenID + "\')/validate";
-                }
-
+                    try {
+                        String trialURl;
+                        PropertiesReader property = new PropertiesReader();
+                        trialURl= property.getProperty("url_beneficiary_Wbnk_validate", getApplicationContext());
+                        String trial[] = trialURl.split("\\(");
+                        System.out.println(trial[0]);
+                        System.out.println(trial[1]);
+                        String str="'"+ BenID +"'";
+                        trial[0]=trial[0]+"(";
+                        trial[0]=trial[0]+str;
+                        urlStr  = trial[0]+trial[1];
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }//----------------------
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+
             success=sh1.jsonWrite(urlStr,postData );
-            System.out.println(success);
             if(success) {
                 response=sh1.getResponse();
                 if (response != null) {
@@ -269,19 +342,19 @@ public class Addbeneficiary extends AppCompatActivity {
                             e.printStackTrace();
                         }
                     }
-                    else
-                    { try {
-                        System.out.println(response);
-                        JSONObject cus1 = new JSONObject(response);
-                        BencustomerNo = cus1.getString("BenCustomer");
-                        JSONArray cusarray1 = cus1.getJSONArray("Name1MvGroup");
-                        for (int k = 0; k < cusarray1.length(); k++) {
-                            JSONObject cus3 = cusarray1.getJSONObject(k);
-                            Benname = cus3.getString("Name1");
+                    else {
+                        try {
+                            System.out.println(response);
+                            JSONObject cus1 = new JSONObject(response);
+                            BencustomerNo = cus1.getString("BenCustomer");
+                            JSONArray cusArray1 = cus1.getJSONArray("Name1MvGroup");
+                            for (int k = 0; k < cusArray1.length(); k++) {
+                                JSONObject cus3 = cusArray1.getJSONObject(k);
+                                Benname = cus3.getString("Name1");
+                            }
+                        } catch (final JSONException e) {
+                            e.printStackTrace();
                         }
-                    } catch (final JSONException e) {
-                        e.printStackTrace();
-                    }
                     }
                 }
             }
@@ -292,7 +365,7 @@ public class Addbeneficiary extends AppCompatActivity {
             benBundle.putString("Email", Email);
             benBundle.putString("Nickname", Nickname);
             benBundle.putString("Benname", Benname);
-            benBundle.putString("OwningCustomer", "190090");
+            benBundle.putString("OwningCustomer", OwningCustomer);
             benBundle.putString("getintent", intentData);
             commit = new Intent(Addbeneficiary.this, ConfirmPage.class);
             commit.putExtras(benBundle);
@@ -303,10 +376,11 @@ public class Addbeneficiary extends AppCompatActivity {
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
             if(success) {
+                progressDialog.dismiss();
                 startActivity(commit);
             }
             else
-                Toast.makeText(Addbeneficiary.this, "error in connection ", Toast.LENGTH_LONG).show();
+                    showErrorText();
         }
     }
 

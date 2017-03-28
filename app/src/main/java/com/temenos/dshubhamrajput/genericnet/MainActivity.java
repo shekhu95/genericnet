@@ -27,6 +27,7 @@ import android.graphics.Typeface;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -50,11 +51,19 @@ public class MainActivity extends AppCompatActivity {
         session1 = new SessionManager(getApplicationContext());
         Intent intent = getIntent();
         getSupportActionBar().setTitle("TEMENOS");
+        HashMap<String,String> owner;
+        SessionManager session =new SessionManager(getApplicationContext());
+        owner=session.getUserDetails();
+        String user= owner.get( "name");
+        TextView welcomeText= (TextView) findViewById(R.id.textView9);
+                welcomeText.setText("Welcome "+user);
+
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         final Intent Addbeneficiary = new Intent(MainActivity.this, Addbeneficiary.class);
         final Intent TransferBwAccounts = new Intent(MainActivity.this, TransferBwAccounts.class);
         final Intent TransferWithinBnk = new Intent(MainActivity.this, TransferWithinBnk.class);
         final Intent TransferOtherBnk = new Intent(MainActivity.this, TransferOtherBnk.class);
+        final Intent ListOfBen=new Intent(MainActivity.this,ListBeneficiaries.class);
 
         setupDrawer();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -120,6 +129,10 @@ public class MainActivity extends AppCompatActivity {
 
                     startActivity(Addbeneficiary);
 
+                else if (expandableListDetail.get(expandableListTitle.get(groupPosition)).get(childPosition).equals( "View list of Beneficiaries"))
+
+                    startActivity(ListOfBen);
+
                 else if(expandableListDetail.get(expandableListTitle.get(groupPosition)).get(childPosition).equals("Transfer within Bank"))
 
                     startActivity(TransferWithinBnk);
@@ -131,6 +144,7 @@ public class MainActivity extends AppCompatActivity {
                 else if(expandableListDetail.get(expandableListTitle.get(groupPosition)).get(childPosition).equals("Transfer to other Bank"))
 
                     startActivity(TransferOtherBnk);
+
                 layout.closeDrawer(GravityCompat.START);
 
                 return false;

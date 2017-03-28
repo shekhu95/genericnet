@@ -1,12 +1,15 @@
 package com.temenos.dshubhamrajput.genericnet;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.InputFilter;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,6 +35,8 @@ public class TransferOtherBnk extends AppCompatActivity {
     public String intentData;
     public static String status;
     public Intent commit;
+    ProgressDialog progressDialog;
+    ProgressDialog preprogressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +48,19 @@ public class TransferOtherBnk extends AppCompatActivity {
         Spinner to = (Spinner) findViewById(R.id.edit_to_other);
         EditText desc = (EditText) findViewById(R.id.edit_desc_other);
         EditText amt = (EditText) findViewById(R.id.edit_amt_other);
+        InputFilter filter = new InputFilter() {
+            public CharSequence filter(CharSequence source, int start, int end,
+                                       Spanned dest, int dstart, int dend) {
+                for (int i = start; i < end; i++) {
+                    if (!Character.isLetterOrDigit(source.charAt(i))) {
+                        return "";
+                    }
+                }
+                return null;
+            }
+        };
+        amt.setFilters(new InputFilter[] { filter });
+        amt.setFilters(new InputFilter[] {new InputFilter.LengthFilter(10)});
         from.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -121,6 +139,15 @@ public class TransferOtherBnk extends AppCompatActivity {
          * Establishes connection with the url and authenticates the user name
          * and password.
          */
+        @Override
+        protected void onPreExecute() {
+            preprogressDialog= new ProgressDialog(TransferOtherBnk.this);
+            preprogressDialog.setMessage("Please wait...");
+            preprogressDialog.show();
+            preprogressDialog.setCancelable(false);
+            super.onPreExecute();
+        }
+
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
@@ -253,10 +280,25 @@ public class TransferOtherBnk extends AppCompatActivity {
             return null;
 
         }
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            preprogressDialog.dismiss();
+            super.onPostExecute(aBoolean);
+        }
+
     }
 
     public class jsonResponse extends AsyncTask<String,Void,Boolean>
     {
+        @Override
+        protected void onPreExecute() {
+            progressDialog= new ProgressDialog(TransferOtherBnk.this);
+            progressDialog.setMessage("Please wait...");
+            progressDialog.show();
+            progressDialog.setCancelable(true);
+            super.onPreExecute();
+        }
+
         protected Boolean doInBackground(String... params) {
             String currencyDeb="";
             String url = "http://10.93.22.116:9089/Test-iris/Test.svc/GB0010001/verFundsTransfer_AcTransObnks(\'"+RefNo+"\')/validate";
@@ -315,6 +357,7 @@ public class TransferOtherBnk extends AppCompatActivity {
                     fundsTransferData.putString("fromAccountNo", params[0]);
                     fundsTransferData.putString("toAccountNo", params[1]);
                     fundsTransferData.putString("description", params[2]);
+                    fundsTransferData.putString("creAcctNo", "USD1000110000001");
                     fundsTransferData.putString("amount", params[3]);
                     fundsTransferData.putString("transType", params[4]);
                     fundsTransferData.putString("Currency",currencyDeb);
@@ -339,6 +382,7 @@ public class TransferOtherBnk extends AppCompatActivity {
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             if(aBoolean){
+                progressDialog.dismiss();
                 startActivity(commit);
             }
             else{
