@@ -34,7 +34,9 @@ public class Addbeneficiary extends AppCompatActivity {
     public static String benID;
     public static boolean success=true;
     ProgressDialog progressDialog;
-
+    String[] errorMessage;
+    EditText benAccNo;
+    EditText ifscEtext;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,8 +46,8 @@ public class Addbeneficiary extends AppCompatActivity {
         final CheckBox withinbank1 = (CheckBox) findViewById(R.id.withinbank);
         final CheckBox neft1 = (CheckBox) findViewById(R.id.neft);
         final TextView ifscTextview = (TextView) findViewById(R.id.textView5);
-        final EditText ifscEtext = (EditText) findViewById(R.id.Ifsc);
-        final EditText benAccNo = (EditText) findViewById(R.id.BenAccNo);
+        ifscEtext = (EditText) findViewById(R.id.Ifsc);
+        benAccNo = (EditText) findViewById(R.id.BenAccNo);
         final EditText accNoCheck = (EditText) findViewById(R.id.ReenterAccNo);
         final EditText emailUser = (EditText) findViewById(R.id.Email);
         final EditText nickName = (EditText) findViewById(R.id.NickName);
@@ -60,6 +62,16 @@ public class Addbeneficiary extends AppCompatActivity {
                 // TODO Auto-generated method stub
                 if (withinbank1.isChecked()) {
                     neft1.setChecked(false);
+                    benAccNo.setText("");
+                    accNoCheck.setText("");
+                    emailUser.setText("");
+                    nickName.setText("");
+                    ifscEtext.setText("");
+                    benAccNo.setError(null);
+                    accNoCheck.setError(null);
+                    emailUser.setError(null);
+                    nickName.setError(null);
+                    ifscEtext.setError(null);
                     ifscTextview.setVisibility(View.INVISIBLE);
                     ifscEtext.setVisibility(View.INVISIBLE);
                     helpIcon.setVisibility(View.INVISIBLE);
@@ -74,6 +86,16 @@ public class Addbeneficiary extends AppCompatActivity {
                 // TODO Auto-generated method stub
                 if (neft1.isChecked()) {
                     withinbank1.setChecked(false);
+                    benAccNo.setText("");
+                    accNoCheck.setText("");
+                    emailUser.setText("");
+                    nickName.setText("");
+                    ifscEtext.setText("");
+                    benAccNo.setError(null);
+                    accNoCheck.setError(null);
+                    emailUser.setError(null);
+                    nickName.setError(null);
+                    ifscEtext.setError(null);
                     ifscTextview.setVisibility(View.VISIBLE);
                     ifscEtext.setVisibility(View.VISIBLE);
                     helpIcon.setVisibility(View.VISIBLE);
@@ -122,7 +144,107 @@ public class Addbeneficiary extends AppCompatActivity {
                     if (!((accNoCheck.getText().toString()).matches("")))
                         accNoCheck.setError("Account numbers don't match");
                 }
-                else if(((accNoCheck.getText().toString()).matches("")))
+                else if(((accNoCheck.getText().toString()).equals("")))
+                    if(!(benAccNo.getText().toString()).equals(""))
+                        accNoCheck.setError("This field cannot be left blank");
+                    else
+                        accNoCheck.setError(null);
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                                          int after) {
+                // TODO Auto-generated method stub
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+
+        emailUser.addTextChangedListener(new TextWatcher() {
+            // ...
+            @Override
+            public void onTextChanged(CharSequence text, int start, int count, int after) {
+                final String email = emailUser.getText().toString();
+                if (!(emailValidator(email))) {
+                    if(!(email.equals("")))
+                        emailUser.setError("Enter a valid email id");
+                } else  {
+                    emailUser.setError(null);
+                }
+
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                                          int after) {
+                // TODO Auto-generated method stub
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+//        ifscEtext.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+//            public void onFocusChange(View v, boolean hasFocus) {
+//                if(!hasFocus) {
+//                    String ifsc = ifscEtext.getText().toString();
+//                    boolean check = ifscMatcher(ifsc);
+//                    if (!check) {
+//                        if(!(ifsc.equals("")))
+//                            ifscEtext.setError("IFSC is a 11 digit alpha numeric string");
+//                    }
+//                    else if (ifscEtext.getText().toString().matches("")) {
+//                        ifscEtext.setError("This field cannot be left blank");
+//                    }
+//                    else
+//                        ifscEtext.setError(null);
+//                }
+//            }
+//        });
+        ifscEtext.addTextChangedListener(new TextWatcher() {
+            // ...
+            @Override
+            public void onTextChanged(CharSequence text, int start, int count, int after) {
+                String ifsc = ifscEtext.getText().toString();
+                boolean check = ifscMatcher(ifsc);
+                if (!check) {
+                    if(!(ifsc.equals("")))
+                        ifscEtext.setError("IFSC is a 11 digit alpha numeric string");
+                }
+                else if (ifscEtext.getText().toString().matches("")) {
+                    ifscEtext.setError("This field cannot be left blank");
+                }
+                else
+                    ifscEtext.setError(null);
+
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                                          int after) {
+                // TODO Auto-generated method stub
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        benAccNo.addTextChangedListener(new TextWatcher() {
+            // ...
+            @Override
+            public void onTextChanged(CharSequence text, int start, int count, int after) {
+                if (!(accNoCheck.getText().toString().equals(benAccNo.getText().toString()))) {
+                    if (!((accNoCheck.getText().toString()).equals("")))
+                        accNoCheck.setError("Account numbers don't match");
+                }
+                else if(((accNoCheck.getText().toString()).equals("")))
                     accNoCheck.setError("This field cannot be left blank");
                 else
                     accNoCheck.setError(null);
@@ -140,39 +262,6 @@ public class Addbeneficiary extends AppCompatActivity {
             }
         });
 
-
-        emailUser.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    final String email = emailUser.getText().toString();
-                    if (!(emailValidator(email))) {
-                        if(!(email.equals("")))
-                            emailUser.setError("Enter a valid email id");
-                    } else  {
-                        emailUser.setError(null);
-                    }
-                }
-            }
-        });
-
-        ifscEtext.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            public void onFocusChange(View v, boolean hasFocus) {
-                if(!hasFocus) {
-                    String ifsc = ifscEtext.getText().toString();
-                    boolean check = ifscMatcher(ifsc);
-                    if (!check) {
-                        if(!(ifsc.equals("")))
-                            ifscEtext.setError("IFSC is a 11 digit alpha numeric string");
-                    }
-                    else if (ifscEtext.getText().toString().matches("")) {
-                        ifscEtext.setError("This field cannot be left blank");
-                    }
-                    else
-                        ifscEtext.setError(null);
-                }
-            }
-        });
     }
 
     public boolean emailValidator(String email) {
@@ -251,7 +340,7 @@ public class Addbeneficiary extends AppCompatActivity {
             JSONObject jsonObjarray1 = new JSONObject();
             Bundle benBundle = new Bundle();
             HttpHandler sh1 = new HttpHandler();
-
+            URLRelated urlObj = new URLRelated(getApplicationContext());
             String benAcctNo = param[1];
             String email = param[2];
             String nickName = param[3];
@@ -283,23 +372,19 @@ public class Addbeneficiary extends AppCompatActivity {
                     Ifsc=param[4];
                     postData.put("BankSortCode", Ifsc);
                     benBundle.putString("Ifsc", Ifsc);
-                    try {
-                        String trialURL;
-                        PropertiesReader property = new PropertiesReader();
-                        trialURL= property.getProperty("url_beneficiary_Obnk_validate", getApplicationContext());
-                        urlStr= sh1.getValidateURL(trialURL,benID);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+
+                    String trialURL;
+                    String[] URLAddressList= {"url_ip","url_iris_project","url_company","url_beneficiary_Obnk_validate"};
+                    trialURL = urlObj.getURL(URLAddressList);
+                    urlStr= urlObj.getValidateURL(trialURL,benID);
+
                 } else {
-                    try {
-                        String trialURL;
-                        PropertiesReader property = new PropertiesReader();
-                        trialURL= property.getProperty("url_beneficiary_Wbnk_validate", getApplicationContext());
-                        urlStr= sh1.getValidateURL(trialURL,benID);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+
+                    String trialURL;
+                    String[] URLAddressList= {"url_ip","url_iris_project","url_company","url_beneficiary_Wbnk_validate"};
+                    trialURL = urlObj.getURL(URLAddressList);
+                    urlStr= urlObj.getValidateURL(trialURL,benID);
+
                 }//----------------------
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -361,24 +446,43 @@ public class Addbeneficiary extends AppCompatActivity {
             if (success) {
                 progressDialog.dismiss();
                 startActivity(commit);
-            } else {
+            }else {
                 progressDialog.dismiss();
                 errorObj = new HttpHandler();
                 errorList = errorObj.getErrorList();
+                errorMessage= new String[errorList.size()];
                 for (int i = 0; i < errorList.size(); i++) {
                     error = errorList.get("Error" + i);
                     text = error.get("text");
-                    info = error.get("info");
+                    info = error.get("info");//field
+                    errorMessage[i]=info;
                 }
-                showErrorText();
+                for(int i=0;i<errorList.size();i++)
+                {
+                    if(intentData.equals("internal")) {
+                        if (errorMessage[i].contains("BenCustomer"))
+                            benAccNo.setError("Check Account Number Entered");
+                    }
+
+                    else if(errorMessage[i].contains("SortCode"))
+                        ifscEtext.setError("Check IFSC Code Entered");
+
+                }
+
             }
+
         }
     }
+
 
     private class NewDeal extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected void onPreExecute() {
+            progressDialog= new ProgressDialog(Addbeneficiary.this);
+            progressDialog.setMessage("Please wait...");
+            progressDialog.show();
+            progressDialog.setCancelable(false);
             super.onPreExecute();
         }
 
@@ -386,24 +490,23 @@ public class Addbeneficiary extends AppCompatActivity {
         protected Void doInBackground(Void... arg0) {
             HttpHandler sh = new HttpHandler();
             String url;
-            try {
-                PropertiesReader property = new PropertiesReader();
-                url = property.getProperty("url_beneficiary_Wbnk_new", getApplicationContext());
-                String jsonStr = sh.makeServiceCall(url);
-                if (jsonStr != null) {
-                    try {
-                        JSONObject jsonObj = new JSONObject(jsonStr);
-                        benID = jsonObj.getString("BeneficiaryId");
-                    } catch (final JSONException e) {
-                    }
+            URLRelated urlObj = new URLRelated(getApplicationContext());
+            String[] URLAddressList= {"url_ip","url_iris_project","url_company","url_beneficiary_Wbnk_new"};
+            url = urlObj.getURL(URLAddressList);
+            String jsonStr = sh.makeServiceCall(url);
+            if (jsonStr != null) {
+                try {
+                    JSONObject jsonObj = new JSONObject(jsonStr);
+                    benID = jsonObj.getString("BeneficiaryId");
+                } catch (final JSONException e) {
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
             }
+
             return null;
         }
         @Override
         protected void onPostExecute(Void result) {
+            progressDialog.dismiss();
             super.onPostExecute(result);
         }
     }
