@@ -1,55 +1,53 @@
 package com.temenos.dshubhamrajput.genericnet;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.Intent;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
-import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.ListPopupWindow;
-import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
+import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.View;
-import android.widget.AdapterView;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import com.baoyz.swipemenulistview.SwipeMenu;
+import com.baoyz.swipemenulistview.SwipeMenuCreator;
+import com.baoyz.swipemenulistview.SwipeMenuItem;
+import com.baoyz.swipemenulistview.SwipeMenuListView;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class ListBeneficiaries extends AppCompatActivity {
-    String Ben="";
-    ListView ListBen;
-    TextView AccNo,NickName,IfscCode,BranchName,Delete;
-    static ArrayList<HashMap<String, String>> beneficiaryList ;
-    ListAdapter adapter1;
-    ListAdapter adapter;
-    int CTR;
-    int id;
-  static String flag  ;
 
+public class Ben_swipe extends AppCompatActivity {
+
+    private SwipeMenuListView ListBen;
+    String Ben="";
+    ProgressDialog progressDialog;
+
+    static ArrayList<HashMap<String, String>> beneficiaryList ;
+    BaseAdapter adapter1;
+    BaseAdapter adapter;
+    int id;
 
     @Override
+
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_list_beneficiaries);
+        setContentView(R.layout.activity_ben_swipe);
+
         getSupportActionBar().setTitle("View beneficiary");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        ListBen=(ListView)findViewById(R.id.ListBen);
-        AccNo=(TextView)findViewById(R.id.AccountNumber);
+        ListBen=(SwipeMenuListView)findViewById(R.id.ListBen);
         final Spinner AddChoice=(Spinner)findViewById(R.id.listben);
         ArrayAdapter<String> spinnerAdapter=new ArrayAdapter<>(this,android.R.layout.simple_spinner_item,android.R.id.text1);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -67,34 +65,38 @@ public class ListBeneficiaries extends AppCompatActivity {
                 Ben=AddChoice.getSelectedItem().toString();
                 if(Ben.equals("Within Bank"))
                 {
-                    new FetchBenWithin().execute();
+                    new Ben_swipe.FetchBenWithin().execute();
                     ListBen.setVisibility(View.VISIBLE);
+
+
                 }
                 else
                 {
-                    new FetchBenOutside().execute();
+                    new Ben_swipe.FetchBenOutside().execute();
                     ListBen.setVisibility(View.VISIBLE);
-                    
+
                 }
+                Toast.makeText(getApplicationContext(),"Swipe Left to Edit and Delete",Toast.LENGTH_LONG).show();
+
             }
         });
 
+        SwipeControl();
+
 
     }
-    public boolean onSupportNavigateUp() {
-        finish();
-        return true;
-    }
-
     private class FetchBenWithin extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
-
+            progressDialog= new ProgressDialog(Ben_swipe.this);
+            progressDialog.setMessage("Please wait...");
+            progressDialog.show();
+            progressDialog.setCancelable(false);
         }
         @Override
         protected Void doInBackground(Void... param) {
 
-                String owningCustomer;
+            String owningCustomer;
             beneficiaryList = new ArrayList<>();
             HttpHandler sh = new HttpHandler();
             URLRelated urlObj = new URLRelated(getApplicationContext());
@@ -115,13 +117,11 @@ public class ListBeneficiaries extends AppCompatActivity {
 
                     JSONObject benAccountNo = itemOwingCust.getJSONObject(i);
                     benList.put("BenAcctNo",benAccountNo.getString("BenAcctNo"));
-                    benList.put("Id",benAccountNo.getString("Id"));
-                    benList.put("Email",benAccountNo.getString("Email"));
+
                     JSONArray NicknameMyGroup = benAccountNo.getJSONArray("NicknameMvGroup");
                     JSONObject nickName = NicknameMyGroup.getJSONObject(0);
                     benList.put("Nickname", nickName.getString("Nickname"));
                     beneficiaryList.add(benList);
-
 
                 }
 
@@ -130,18 +130,17 @@ public class ListBeneficiaries extends AppCompatActivity {
             }
 
 
-        return null;
+            return null;
         }
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-                flag="internal";
-             adapter = new SimpleAdapter(ListBeneficiaries.this, beneficiaryList,
-                    R.layout.list_ben_internal, new String[]{"BenAcctNo","Nickname"},
+                progressDialog.dismiss();
+            adapter = new SimpleAdapter(Ben_swipe.this, beneficiaryList,
+                    R.layout.cardtrial, new String[]{"BenAcctNo","Nickname"},
                     new int[]{R.id.AccountNumber,R.id.NickName});
 
             ListBen.setAdapter(adapter);
-
 
 
         }
@@ -150,7 +149,10 @@ public class ListBeneficiaries extends AppCompatActivity {
 
         @Override
         protected void onPreExecute() {
-
+            progressDialog= new ProgressDialog(Ben_swipe.this);
+            progressDialog.setMessage("Please wait...");
+            progressDialog.show();
+            progressDialog.setCancelable(false);
         }
         @Override
         protected Void doInBackground(Void... param) {
@@ -177,8 +179,7 @@ public class ListBeneficiaries extends AppCompatActivity {
                     benList.put("BenAccNo" ,benAccountNo.getString("BenAcctNo"));
                     benList.put("BankSortCode" ,benAccountNo.getString("BankSortCode"));
                     benList.put("Branch" ,benAccountNo.getString("Branch"));
-                    benList.put("Id",benAccountNo.getString("Id"));
-                    benList.put("Email",benAccountNo.getString("Email"));
+
                     JSONArray NicknameMyGroup = benAccountNo.getJSONArray("NicknameMvGroup");
                     JSONObject nickName = NicknameMyGroup.getJSONObject(0);
                     benList.put("Nickname" , nickName.getString("Nickname"));
@@ -194,62 +195,231 @@ public class ListBeneficiaries extends AppCompatActivity {
         }
         @Override
         protected void onPostExecute(Void result) {
+
             super.onPostExecute(result);
-                flag="external";
-             adapter1 = new SimpleAdapter(ListBeneficiaries.this, beneficiaryList,
-                    R.layout.list_beneficiary, new String[]{"BenAccNo","Nickname","BankSortCode","Branch"},
+                progressDialog.dismiss();
+            adapter1 = new SimpleAdapter(Ben_swipe.this, beneficiaryList,
+                    R.layout.benextcardtrial, new String[]{"BenAccNo","Nickname","BankSortCode","Branch"},
                     new int[]{R.id.AccountNumber,R.id.NickName,R.id.Ifsc,R.id.BranchName});
             ListBen.setAdapter(adapter1);
         }
     }
-    public void BenEdit(View V)
-    {
-        Bundle benBundle = new Bundle();
-        HashMap<String, String> obj;
-        View parentRow = (View) V.getParent();
-        ListView listView = (ListView) parentRow.getParent();
-        final int position = listView.getPositionForView(parentRow);
-            obj = beneficiaryList.get(position);
-        String  benAcc,Id,nickName,bnksort,branch,email;
-        if(flag.equals("internal"))
-        {
-           benAcc=obj.get("BenAcctNo");
-            Id= obj.get("Id");
-            nickName= obj.get("Nickname");
-            email=obj.get("Email");
-        }
-        else
-        {
-            benAcc=obj.get("BenAcctNo");
-            Id= obj.get("Id");
-            email=obj.get("Email");
-            nickName= obj.get("Nickname");
-            branch= obj.get("Branch");
-            bnksort = obj.get("BankSortCode");
-            benBundle.putString("branch", branch);
-            benBundle.putString("bnksort",bnksort);
-        }
-            benBundle.putString("flag",flag);
-            benBundle.putString("benAcc",benAcc);
-            benBundle.putString("Id",Id);
-            benBundle.putString("nickName",nickName);
-            benBundle.putString("Email",email);
-        Intent in= new Intent(ListBeneficiaries.this,Addbeneficiary.class);
-            in.putExtras(benBundle);
-            startActivity(in);
-//        Toast.makeText(getApplicationContext(),
-//                "Position of edit" + position,
-//                Toast.LENGTH_LONG).show();
+    public boolean onSupportNavigateUp() {
+        finish();
+        return true;
     }
-    public void BenDel(View V)
-    {
-        View parentRow = (View) V.getParent();
-        ListView listView = (ListView) parentRow.getParent();
-        final int position = listView.getPositionForView(parentRow);
 
-//        Toast.makeText(getApplicationContext(),
-//                "Position of Delete" + position,
-//                Toast.LENGTH_LONG).show();
+    private void SwipeControl() {
+
+
+
+        ListBen.setSwipeDirection(SwipeMenuListView.DIRECTION_LEFT);
+
+        SwipeMenuCreator creator = new SwipeMenuCreator() {
+
+
+            @Override
+
+            public void create(SwipeMenu menu) {
+
+// Create different menus depending on the view type
+                menu.setViewType(R.layout.menulayout);
+
+                SwipeMenuItem goodItem = new SwipeMenuItem(
+
+                        getApplicationContext());
+// set item background
+
+                goodItem.setBackground(R.color.transparent);
+
+// set item width
+                goodItem.setWidth(dp2px(90));
+// set a icon
+                goodItem.setIcon(R.drawable.edit);
+// add to menu
+                menu.addMenuItem(goodItem);
+
+// create "delete" item
+
+                SwipeMenuItem deleteItem = new SwipeMenuItem(
+
+                        getApplicationContext());
+
+// set item background
+
+                deleteItem.setBackground(R.color.transparent);
+
+// set item width
+
+                deleteItem.setWidth(dp2px(90));
+
+// set a icon
+
+                deleteItem.setIcon(R.drawable.delete);
+
+// add to menu
+
+                menu.addMenuItem(deleteItem);
+
+            }
+
+        };
+
+// set creator
+
+        ListBen.setMenuCreator(creator);
+
+        ListBen.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
+
+            @Override
+
+            public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
+
+                switch (index) {
+
+                    case 0:
+
+                        Toast.makeText(Ben_swipe.this,"Like button press from position" + position,Toast.LENGTH_SHORT).show();
+
+                        break;
+
+                    case 1:
+
+                        beneficiaryList.remove(position);
+                        alert();
+
+                        break;
+
+                }
+
+                return true;
+
+            }
+
+        });
+
+
+        ListBen.setOnMenuStateChangeListener(new SwipeMenuListView.OnMenuStateChangeListener() {
+
+            @Override
+
+            public void onMenuOpen(int position) {
+
+            }
+
+            @Override
+
+            public void onMenuClose(int position) {
+
+            }
+
+        });
+
+        ListBen.setOnSwipeListener(new SwipeMenuListView.OnSwipeListener() {
+
+            @Override
+
+            public void onSwipeStart(int position) {
+
+            }
+
+            @Override
+
+            public void onSwipeEnd(int position) {
+
+            }
+
+        });
+
     }
+
+    class ListDataAdapter extends BaseAdapter {
+
+        ViewHolder holder;
+
+        @Override
+
+        public int getCount() {
+
+            return beneficiaryList.size();
+
+        }
+
+        @Override
+
+        public Object getItem(int i) {
+
+            return null;
+
+        }
+
+        @Override
+
+        public long getItemId(int i) {
+
+            return 0;
+
+        }
+
+        @Override
+
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            if(convertView==null){
+
+                holder=new ViewHolder();
+
+                convertView=getLayoutInflater().inflate(R.layout.list_item,null);
+
+                holder.mTextview=(TextView)convertView.findViewById(R.id.textView);
+
+                convertView.setTag(holder);
+
+            }else {
+
+                holder= (ViewHolder) convertView.getTag();
+
+            }
+
+            //holder.mTextview.setText(beneficiaryList.get(position));//why set text??
+
+            return convertView;
+
+        }
+
+        class ViewHolder {
+
+            TextView mTextview;
+
+        }
+
+    }
+
+    private int dp2px(int dp) {
+
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
+
+                getResources().getDisplayMetrics());
+
+    }
+    public void alert(){
+        AlertDialog.Builder adb = new AlertDialog.Builder(this);
+                adb.setTitle("Delete?");
+                adb.setMessage("Delete Beneficiary");
+                adb.setCancelable(false);
+                adb.setNegativeButton("Cancel", null);
+        adb.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                if(Ben.equals("Within Bank"))
+                    adapter.notifyDataSetChanged();
+                else
+                    adapter1.notifyDataSetChanged();
+
+            } });
+
+
+        adb.show();
+    }
+
 
 }

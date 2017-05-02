@@ -9,7 +9,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputFilter;
-import android.text.Spanned;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,8 +22,6 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 
 
@@ -42,9 +39,10 @@ public class TransferBwAccounts extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_transfer_bw_accts);
-        getSupportActionBar().setTitle("Account Transfer");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+        if(getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("Account Transfer");
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
         /* Takes the id of the spinner and EditText field*/
         Spinner from = (Spinner) findViewById(R.id.editText);
         Spinner to = (Spinner) findViewById(R.id.editText6);
@@ -322,7 +320,7 @@ public class TransferBwAccounts extends AppCompatActivity {
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             HttpHandler errorObj;
-            String text, info;
+            String text;
 
             HashMap<String, HashMap<String, String>> errorList;
             HashMap<String, String> error;
@@ -338,14 +336,15 @@ public class TransferBwAccounts extends AppCompatActivity {
                 for (int i = 0; i < errorList.size(); i++) {
                     error = errorList.get("Error" + i);
                     text = error.get("text");
-                    info = error.get("info");//field
                     errorMessage[i]=text;
+
                 }
                 for(int i=0;i<errorList.size();i++)
                 {
+                    String[] errorList1 = errorMessage[i].split("\\(");
                     new AlertDialog.Builder(TransferBwAccounts.this)
                             .setTitle("Error")
-                            .setMessage(errorMessage[i])
+                            .setMessage(errorList1[0])
                             .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
                                     // continue with delete
