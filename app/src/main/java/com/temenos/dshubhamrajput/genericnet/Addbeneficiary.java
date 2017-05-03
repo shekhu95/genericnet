@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -49,6 +50,7 @@ public class Addbeneficiary extends AppCompatActivity {
     CheckBox neft1 ;
      TextView ifscTextview ;
    ImageView helpIcon ;
+    View focusView = null;
     public static String ifsc;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +67,7 @@ public class Addbeneficiary extends AppCompatActivity {
         final EditText emailUser = (EditText) findViewById(R.id.Email);
         final EditText nickName = (EditText) findViewById(R.id.NickName);
           helpIcon = (ImageView) findViewById(R.id.help_icon);
-
+          
         // for the Qr
         final Bundle extras = getIntent().getExtras();
         if(extras!=null) {
@@ -83,7 +85,13 @@ public class Addbeneficiary extends AppCompatActivity {
             benAccNo.setText(toAccount);
             accNoCheck.setText(toAccount);
             nickName.setText(nick);
-            new fromAccount().execute(ifsc);
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                new fromAccount().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,ifsc);
+            }
+            else {
+                new fromAccount().execute(ifsc);
+            }
+
 
 
         }
@@ -571,14 +579,12 @@ private class fromAccount extends AsyncTask<String, Void, Boolean> {
                     JSONObject acctNoOfCustomer = item.getJSONObject(i);
                     final String diffAcctNo = acctNoOfCustomer.getString("AccountNo");
                     final String ifscCode = acctNoOfCustomer.getString("Ifsc");
-                    if(ifscCode!=null)
+                    if(!ifscCode.equals(""))
                         ifscSpinnerVal.put("ifscCodeString",ifscCode);
 
                 }
                  String firstFourLetterToIfsc = params[0].substring(0,4);
-
-
-                String firstFourLetterFromIfsc = ifscSpinnerVal.get("ifscCodeString").substring(0,4);
+                 String firstFourLetterFromIfsc = ifscSpinnerVal.get("ifscCodeString").substring(0,4);
                 if(firstFourLetterFromIfsc.equals(firstFourLetterToIfsc))
                 {
                     flag=true;
