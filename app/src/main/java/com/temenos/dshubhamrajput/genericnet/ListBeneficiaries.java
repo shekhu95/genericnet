@@ -1,18 +1,10 @@
 package com.temenos.dshubhamrajput.genericnet;
 
-import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.ListPopupWindow;
-import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListAdapter;
@@ -20,7 +12,6 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,7 +23,7 @@ import java.util.HashMap;
 public class ListBeneficiaries extends AppCompatActivity {
     String Ben="";
     ListView ListBen;
-    TextView AccNo,NickName,IfscCode,BranchName,Delete;
+    TextView AccNo;
     static ArrayList<HashMap<String, String>> beneficiaryList ;
     ListAdapter adapter1;
     ListAdapter adapter;

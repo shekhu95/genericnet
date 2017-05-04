@@ -31,7 +31,6 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.TextView;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import com.tem.pack.GenUrl;
