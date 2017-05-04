@@ -1,11 +1,10 @@
 package com.temenos.dshubhamrajput.genericnet;
 
 import android.content.Context;
-import android.content.ContextWrapper;
 
 import java.io.IOException;
 
-/**
+/*
  * Created by upriya on 29-03-2017.
  */
 
@@ -15,7 +14,7 @@ public class URLRelated  {
     {
         context = paramContext.getApplicationContext();
     }
-    public String getValidateURL(String initialURL,String benID)
+    String getValidateURL(String initialURL,String benID)
     {
         String urlStr;
         String trial[] = initialURL.split("\\(");
@@ -29,7 +28,7 @@ public class URLRelated  {
     }
     public String getURLParameter(String[] urlAddressList,String param)
     {
-        String urlString=null,user;
+        String urlString=null;
         try {
             PropertiesReader pro = new PropertiesReader();
             urlString = pro.getProperty(urlAddressList[0],context);
@@ -43,7 +42,7 @@ public class URLRelated  {
         }
         return urlString;
     }
-    public String getURL(String[] urlAddressList)
+    String getURL(String[] urlAddressList)
     {
         String urlString=null;
         try {

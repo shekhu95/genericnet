@@ -44,7 +44,7 @@ public class ExpandableListDataPump {
         expandableListDetail.put("Account Transfer", Account_Transfer);
         expandableListDetail.put("Generate QR Code",qrGenerator);
         expandableListDetail.put("Scan QR Code",qrCode);
-        expandableListDetail.put("Settings", Settings);
+        expandableListDetail.put("Reset Password", Settings);
         expandableListDetail.put("Help", Help);
         expandableListDetail.put("Feedback", Feedback);
         expandableListDetail.put("Logout", Logout);

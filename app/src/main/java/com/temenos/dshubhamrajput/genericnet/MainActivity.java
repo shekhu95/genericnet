@@ -112,6 +112,11 @@ public class MainActivity extends AppCompatActivity {
                     layout.closeDrawer(GravityCompat.START);
                 }
 
+                else if(expandableListTitle.get(groupPosition).equals("Help"))
+
+                    startActivity(Help_activity);
+
+
             }
         });
 
@@ -149,9 +154,6 @@ public class MainActivity extends AppCompatActivity {
 
                     startActivity(TransferOtherBnk);
 
-                else if(expandableListDetail.get(expandableListTitle.get(groupPosition)).get(childPosition).equals("Help"))
-
-                    startActivity(Help_activity);
 
                 layout.closeDrawer(GravityCompat.START);
 
