@@ -4,21 +4,14 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.text.Layout;
+import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -37,9 +30,6 @@ import java.util.HashMap;
 public class Ben_swipe extends AppCompatActivity {
 
     private SwipeMenuListView ListBen;
-    private ArrayList<String> mArrayList=new ArrayList<>();
-    private ListDataAdapter mListDataAdapter;
-    public static boolean success=true;
     String Ben="";
     ProgressDialog progressDialog;
 
@@ -54,12 +44,12 @@ public class Ben_swipe extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ben_swipe);
+
         getSupportActionBar().setTitle("View beneficiary");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
         ListBen=(SwipeMenuListView)findViewById(R.id.ListBen);
         final Spinner AddChoice=(Spinner)findViewById(R.id.listben);
-        ArrayAdapter<String> spinnerAdapter=new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,android.R.id.text1);
+        ArrayAdapter<String> spinnerAdapter=new ArrayAdapter<>(this,android.R.layout.simple_spinner_item,android.R.id.text1);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         AddChoice.setAdapter(spinnerAdapter);
         spinnerAdapter.add("Within Bank");
@@ -98,7 +88,10 @@ public class Ben_swipe extends AppCompatActivity {
     private class FetchBenWithin extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
-
+            progressDialog= new ProgressDialog(Ben_swipe.this);
+            progressDialog.setMessage("Please wait...");
+            progressDialog.show();
+            progressDialog.setCancelable(false);
         }
         @Override
         protected Void doInBackground(Void... param) {
@@ -142,7 +135,7 @@ public class Ben_swipe extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-
+                progressDialog.dismiss();
             adapter = new SimpleAdapter(Ben_swipe.this, beneficiaryList,
                     R.layout.cardtrial, new String[]{"BenAcctNo","Nickname"},
                     new int[]{R.id.AccountNumber,R.id.NickName});
@@ -204,7 +197,7 @@ public class Ben_swipe extends AppCompatActivity {
         protected void onPostExecute(Void result) {
 
             super.onPostExecute(result);
-
+                progressDialog.dismiss();
             adapter1 = new SimpleAdapter(Ben_swipe.this, beneficiaryList,
                     R.layout.benextcardtrial, new String[]{"BenAccNo","Nickname","BankSortCode","Branch"},
                     new int[]{R.id.AccountNumber,R.id.NickName,R.id.Ifsc,R.id.BranchName});
@@ -235,24 +228,15 @@ public class Ben_swipe extends AppCompatActivity {
                 SwipeMenuItem goodItem = new SwipeMenuItem(
 
                         getApplicationContext());
-
 // set item background
 
                 goodItem.setBackground(R.color.transparent);
 
 // set item width
-
                 goodItem.setWidth(dp2px(90));
-
-
-
-
 // set a icon
-
                 goodItem.setIcon(R.drawable.edit);
-
 // add to menu
-
                 menu.addMenuItem(goodItem);
 
 // create "delete" item

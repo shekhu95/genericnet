@@ -30,10 +30,7 @@ import javax.net.ssl.HttpsURLConnection;
 public class HttpHandler {
     private String response = "";
     private static String basicAuth = "";
-    private static final String TAG = HttpHandler.class.getSimpleName();
     private String returnResponse = "";
-    private static String userName="";
-    private static String passWord="";
     private static HashMap<String,String> innerErrorObj = new HashMap<>();
     private static HashMap<String,HashMap<String,String>> outerErrorObj = new HashMap<>();
 
@@ -58,9 +55,7 @@ public class HttpHandler {
         return response;
     }
 
-    public String makeServiceCallGet(String reqUrl) {
-        String response = null;
-
+    String makeServiceCallGet(String reqUrl) {
         try {
 
             URL e = new URL(reqUrl);
@@ -77,7 +72,7 @@ public class HttpHandler {
         return this.response;
     }
 
-    public String convertStreamToString(InputStream is) {
+    private String convertStreamToString(InputStream is) {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         StringBuilder sb = new StringBuilder();
 
@@ -173,6 +168,7 @@ public class HttpHandler {
 
                     }
                 } catch (Exception exception) {
+                    exception.printStackTrace();
                 }
                 //------------------------------------
             }
@@ -201,7 +197,7 @@ public class HttpHandler {
             urlcommit.setRequestMethod("POST");
             urlcommit.connect();
             OutputStreamWriter commitout = new OutputStreamWriter(urlcommit.getOutputStream());
-            commitout.write(jsonstring);// here i sent the parameter
+            commitout.write(jsonstring);// here i send the parameter
             commitout.flush();
             commitout.close();
 
@@ -253,6 +249,7 @@ public class HttpHandler {
 
                     }
                 } catch (Exception exception) {
+                    exception.printStackTrace();
                 }
                 //
 
@@ -278,12 +275,10 @@ public class HttpHandler {
             conn.setDoInput(true);
             conn.setDoOutput(true);
 
-
             OutputStream os = conn.getOutputStream();
             BufferedWriter writer = new BufferedWriter(
                     new OutputStreamWriter(os, "UTF-8"));
             writer.write(postdata.toString());
-
             writer.flush();
             writer.close();
             os.close();
@@ -292,13 +287,11 @@ public class HttpHandler {
             BufferedInputStream in;
             BufferedReader reader;
             StringBuilder sb;
-
             if (responseCode >= 200 && responseCode < 400) {
                 success=true;
                 in = new BufferedInputStream(conn.getInputStream());
                 reader = new BufferedReader(new InputStreamReader(in));
                 sb = new StringBuilder();
-
                 try {
                     String line;
                     try {
@@ -315,10 +308,7 @@ public class HttpHandler {
                     } catch (IOException var13) {
                         var13.printStackTrace();
                     }
-
                 }
-
-
             } else {
                 // READING THE ERROR
                 success = false;
@@ -361,14 +351,10 @@ public class HttpHandler {
                             innerErrorObj.put("info",info);
                             outerErrorObj.put("Error"+j,innerErrorObj);
                         }
-
                     }
                 } catch (Exception exception) {
                 }
-
             }
-
-
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {
@@ -378,7 +364,6 @@ public class HttpHandler {
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
-
             e.printStackTrace();
         }
         return success;
@@ -388,14 +373,12 @@ public class HttpHandler {
         return returnResponse;
     }
 
-    public void setCredentials(String user,String mpassword)
+    void setCredentials(String user,String mpassword)
     {
-        userName = user;
-        passWord = mpassword;
         String userPass =  user + ":" + mpassword;
         basicAuth = "Basic " + new String((new Base64()).encode(userPass.getBytes()));
     }
-    public HashMap<String,HashMap<String,String>> getErrorList()
+    HashMap<String,HashMap<String,String>> getErrorList()
     {
         return outerErrorObj;
     }

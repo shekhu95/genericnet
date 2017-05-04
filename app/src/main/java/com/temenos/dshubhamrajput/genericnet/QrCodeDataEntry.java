@@ -42,15 +42,11 @@ public class QrCodeDataEntry extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_qr_transfer);
-        if(getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         final Bundle extras = getIntent().getExtras();
         imp = extras.getString("acctAndIfsc");
-        String[] divide = new String[6];
-        while(imp != null) {
-            divide = imp.split(":");
-        }
+        String[] divide = imp.split(":");
         String toAccount = divide[0];
         final String ifsc = divide[1];
         final String nickName = divide[2];
@@ -59,6 +55,7 @@ public class QrCodeDataEntry extends AppCompatActivity {
         final String firstFourLetterToIfsc = ifsc.substring(0,4);
         final TextView Accno= (TextView)findViewById(R.id.qr_from_acct_value);
         Accno.setText(toAccount);
+        Accno.setKeyListener(null);
         new fromAccountSpinnerVal().execute(firstFourLetterToIfsc);
 
         buttonScan = (Button) findViewById(R.id.button4);
@@ -147,7 +144,7 @@ public class QrCodeDataEntry extends AppCompatActivity {
                         JSONObject acctNoOfCustomer = item.getJSONObject(i);
                         final String diffAcctNo = acctNoOfCustomer.getString("AccountNo");
                         final String ifscCode = acctNoOfCustomer.getString("Ifsc");
-                        if(ifscCode!=null)
+                        if(!ifscCode.equals(""))
                             ifscSpinnerVal.put("ifscCodeString",ifscCode);
                         runOnUiThread(new Runnable() {
                             @Override

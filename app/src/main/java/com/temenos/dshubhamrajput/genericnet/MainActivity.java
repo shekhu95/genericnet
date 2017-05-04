@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     List<String> expandableListTitle;
     LinkedHashMap<String, List<String>> expandableListDetail;
     DrawerLayout layout;
+    public Intent callSum;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         owner=session.getUserDetails();
         String user= owner.get( "name");
         TextView welcomeText= (TextView) findViewById(R.id.textView9);
-                welcomeText.setText("Welcome "+user);
+                welcomeText.setText("Welcome\n "+user);
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         final Intent Addbeneficiary = new Intent(MainActivity.this, Addbeneficiary.class);
@@ -52,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
         final Intent TransferWithinBnk = new Intent(MainActivity.this, TransferWithinBnk.class);
         final Intent TransferOtherBnk = new Intent(MainActivity.this, TransferOtherBnk.class);
         final Intent ListOfBen=new Intent(MainActivity.this,Ben_swipe.class);
+        final Intent Help_activity=new Intent(MainActivity.this,Help_activity.class);
 
         setupDrawer();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -96,19 +98,24 @@ public class MainActivity extends AppCompatActivity {
 
                 }
 
-                else if(expandableListTitle.get(groupPosition).equals("Qr Code Generator"))
+                else if(expandableListTitle.get(groupPosition).equals("Generate QR Code"))
                 {
                     Intent intent = new Intent(MainActivity.this, QrCodeGenerate.class);
                     startActivity(intent);
                     layout.closeDrawer(GravityCompat.START);
                 }
 
-                else if(expandableListTitle.get(groupPosition).equals("Qr Code Scanner"))
+                else if(expandableListTitle.get(groupPosition).equals("Scan QR Code"))
                 {
                     Intent intent = new Intent(MainActivity.this, QrCodeScan.class);
                     startActivity(intent);
                     layout.closeDrawer(GravityCompat.START);
                 }
+
+                else if(expandableListTitle.get(groupPosition).equals("Help"))
+
+                    startActivity(Help_activity);
+
 
             }
         });
@@ -146,6 +153,7 @@ public class MainActivity extends AppCompatActivity {
                 else if(expandableListDetail.get(expandableListTitle.get(groupPosition)).get(childPosition).equals("Transfer to other Bank"))
 
                     startActivity(TransferOtherBnk);
+
 
                 layout.closeDrawer(GravityCompat.START);
 
@@ -228,5 +236,25 @@ public class MainActivity extends AppCompatActivity {
         this.finish();
     }
 
+    public void callSummary(View v)
+    {
+        callSum = new Intent(MainActivity.this, AcctSumActivity.class);
+        startActivity(callSum );
+    }
+    public void generateQr(View v)
+    {
+        callSum = new Intent(MainActivity.this, QrCodeGenerate.class);
+        startActivity(callSum );
+    }
 
+    public void addBen(View v)
+    {
+        callSum = new Intent(MainActivity.this, Addbeneficiary.class);
+        startActivity(callSum );
+    }
+    public void callFT(View v)
+    {
+        callSum = new Intent(MainActivity.this, TransferWithinBnk.class);
+        startActivity(callSum );
+    }
 }

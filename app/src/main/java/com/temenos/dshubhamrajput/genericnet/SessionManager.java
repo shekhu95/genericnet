@@ -19,10 +19,10 @@ public class SessionManager {
         SharedPreferences.Editor editor;
 
         // Context
-        Context _context;
+        private Context _context;
 
         // Shared pref mode
-        int PRIVATE_MODE = 0;
+        private int PRIVATE_MODE = 0;
 
         // Sharedpref file name
         private static final String PREF_NAME = "Pref";

@@ -20,9 +20,9 @@ public class SucessPage extends AppCompatActivity {
         final Bundle extras = getIntent().getExtras();
         imp = extras.getString("Sucess");
         if(imp.equals("Ben"))
-            setSucessText.setText("Beneficiary Added");
+            setSucessText.setText(R.string.ben_add);
         else
-            setSucessText.setText("Transaction Successfull!");
+            setSucessText.setText(R.string.tran_success);
 
         confirm.setOnClickListener(new View.OnClickListener() {
             @Override
