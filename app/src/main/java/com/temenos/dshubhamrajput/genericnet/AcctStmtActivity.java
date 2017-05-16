@@ -2,7 +2,6 @@ package com.temenos.dshubhamrajput.genericnet;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
@@ -79,7 +78,7 @@ public class AcctStmtActivity extends AppCompatActivity  {
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                if(position == 0){
+                if(position != 0){
                     DateEdit.setVisibility(View.GONE);
                     DateEdit2.setVisibility(View.GONE);
                     Fromdate.setVisibility(View.GONE);

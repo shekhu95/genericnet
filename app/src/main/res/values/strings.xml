@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">TEMENOS</string>
+    <string name="app_name">Temenos Mobile Banking</string>
 
-    <!-- Strings related to login -->
+    <!-- strings related to login -->
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
     <string name="username">Username</string>
@@ -11,9 +11,7 @@
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
-    <string name="permission_rationale">"Contacts permissions are needed for providing email
-        completions."
-    </string>
+    <string name="permission_rationale">Contacts permissions are needed for providing email completions.</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="error_message">Invalid Username or Password</string>
     <string name="urlstring">http://10.93.21.84:8085/Test-iris/Test.svc/GB0010001/enqUservalidates()</string>
@@ -36,4 +34,28 @@
     <string name="ft_indicator">ftintetnt</string>
     <string name="title_activity_list_beneficiaries">ListBeneficiaries</string>
     <string name="Error_text">Check the data entered</string>
+
+    <!-- Funds Transfer Confirm page values -->
+    <string name="from_account">From Account</string>
+    <string name="to_account">To Account</string>
+    <string name="desc">Description</string>
+    <string name="amt">Amount</string>
+    <string name="nick_name">Nick Name</string>
+    <string name="branch_name">Branch Name</string>
+    <string name="bank_sort_code">Bank Sort Code</string>
+
+    <!-- Add beneficiary Confirm Page values -->
+    <string name="account_number">Account Number</string>
+    <string name="cus_name">Customer Name</string>
+    <string name="ifsc_code">IFSC Code</string>
+    <string name="title_activity_list_check">ListCheck</string>
+    <string name="title_activity_simple">SimpleActivity</string>
+
+    <!-- Account summary strings value -->
+    <string name="account_title">Customer Name</string>
+    <string name="cus_id">Customer ID</string>
+
+    <!-- Success Page string settings -->
+    <string name="ben_add">Beneficiary Added</string>
+    <string name="tran_success">Transaction Successful!</string>
 </resources>

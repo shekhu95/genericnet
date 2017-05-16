@@ -4,38 +4,30 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
-
-
+import android.os.Build;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.IOException;
-
 import java.util.HashMap;
-
 
 
 public class ConfirmPage extends AppCompatActivity {
     public Intent test;
     public static String imp;
-    public TextView e5;
     public TextView t1,t2,t3,t4,t5,t6,t7;
-    public TextView e1,e2,e3,e4;
     final HashMap<String, String> obj = new HashMap<>();
     boolean success=true;
     static public String status;
     ProgressDialog progressDialog;
-    static String response;
-    // Bundle Confirmbundle = new Bundle();
+    ProgressDialog preprogressDialog;
+    String[] errorMessage;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,8 +54,6 @@ public class ConfirmPage extends AppCompatActivity {
         imp = extras.getString("getintent");
         if(imp.equals("internal"))
         {
-
-
             TextView Accno= (TextView) findViewById(R.id.editText);
             TextView Email = (TextView)findViewById(R.id.editText6);
             TextView nickname=(TextView)findViewById(R.id.editText7);
@@ -72,12 +62,11 @@ public class ConfirmPage extends AppCompatActivity {
             Ifsc.setVisibility(View.GONE);
             t6.setVisibility(View.GONE);
 
+            t1.setText(R.string.account_number);
+            t2.setText(R.string.prompt_email);
+            t3.setText(R.string.nick_name);
+            t4.setText(R.string.cus_name);
 
-
-            t1.setText("Account Number");
-            t2.setText("Email");
-            t3.setText("Nick Name");
-            t4.setText("Customer Name");
             Accno.setText(extras.getString("BenAcctNo"));
             Email.setText(extras.getString("Email"));
             nickname.setText(extras.getString("Nickname"));
@@ -87,7 +76,11 @@ public class ConfirmPage extends AppCompatActivity {
             obj.put("BeneficiaryId",extras.getString("BeneficiaryId"));
             obj.put("Email",extras.getString("Email"));
             obj.put("Nickname",extras.getString("Nickname"));
-            obj.put("OwningCustomer",extras.getString("190090"));
+            HashMap<String,String> owner;
+            SessionManager session =new SessionManager(getApplicationContext());
+            owner=session.getUserDetails();
+            String  owningCustomer= owner.get("cusId");
+            obj.put("OwningCustomer",extras.getString(owningCustomer));
             Button viewStmt = (Button) findViewById(R.id.button2);
             viewStmt.setOnClickListener(new View.OnClickListener() {
 
@@ -100,7 +93,6 @@ public class ConfirmPage extends AppCompatActivity {
         }
         else if(imp.equals("external"))
         {
-
             TextView Accno= (TextView)findViewById(R.id.editText);
             TextView Email = (TextView)findViewById(R.id.editText6);
             TextView nickname=(TextView)findViewById(R.id.editText7);
@@ -109,17 +101,15 @@ public class ConfirmPage extends AppCompatActivity {
             //TextView IfscBranch=(TextView)findViewById(R.id.editText20);
             t6.setVisibility(View.GONE);
 
+            t1.setText(R.string.account_number);
+            t2.setText(R.string.prompt_email);
+            t3.setText(R.string.nick_name);
+            t4.setText(R.string.ifsc_code);
+            t5.setText(R.string.branch_name);
 
-
-            t1.setText("Account Number");
-            t2.setText("Email");
-            t3.setText("Nick Name");
-            t4.setText("IFSC code");
-            t5.setText("Branch Name");
             Accno.setText(extras.getString("BenAcctNo"));
             Email.setText(extras.getString("Email"));
             nickname.setText(extras.getString("Nickname"));
-            //Customername.setText(extras.getString("Ifsc"));
             Ifsc.setText(extras.getString("IfscBranch"));
             IfscBranch.setText(extras.getString("Ifsc"));
             obj.put("BenAcctNo",extras.getString("BenAcctNo"));
@@ -128,7 +118,11 @@ public class ConfirmPage extends AppCompatActivity {
             obj.put("Email",extras.getString("Email"));
             obj.put("Nickname",extras.getString("Nickname"));
             obj.put("Ifsc",extras.getString("Ifsc"));
-            obj.put("OwningCustomer",extras.getString("190090"));
+            HashMap<String,String> owner;
+            SessionManager session =new SessionManager(getApplicationContext());
+            owner=session.getUserDetails();
+            String owningCustomer= owner.get("cusId");
+            obj.put("OwningCustomer",extras.getString(owningCustomer));
             Button viewStmt = (Button) findViewById(R.id.button2);
             viewStmt.setOnClickListener(new View.OnClickListener() {
 
@@ -148,10 +142,10 @@ public class ConfirmPage extends AppCompatActivity {
 
             getSupportActionBar().setTitle("Confirm Transfer");
             t6.setVisibility(View.GONE);
-            t1.setText("From Account");
-            t2.setText("To Account");
-            t3.setText("Description");
-            t4.setText("Amount");
+            t1.setText(R.string.from_account);
+            t2.setText(R.string.to_account);
+            t3.setText(R.string.desc);
+            t4.setText(R.string.amt);
             frmAcct.setText(extras.getString("fromAccountNo"));
             toAcct.setText(extras.getString("toAccountNo"));
             des.setText(extras.getString("description"));
@@ -163,10 +157,17 @@ public class ConfirmPage extends AppCompatActivity {
 
                 @Override
                 public void onClick(View arg0) {
-                    String url = "http://10.93.22.116:9089/Test-iris/Test.svc/GB0010001/verFundsTransfer_AcTranss()/input";
-                    new commitFunCall().execute("account",url,extras.getString("RefNo"),extras.getString("transType"),extras.getString("fromAccountNo"),extras.getString("Currency"),extras.getString("amount")
-                            ,extras.getString("toAccountNo"),extras.getString("description"));
-
+                    URLRelated urlObj = new URLRelated(getApplicationContext());
+                    String[] URLAddressList = {"url_ip", "url_iris_project", "url_company", "url_verFundsTransfer_AcTranss_input"};
+                    String url = urlObj.getURL(URLAddressList);
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                        new commitFunCall().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,"bwAccounts", url, extras.getString("RefNo"), extras.getString("transType"), extras.getString("fromAccountNo"), extras.getString("Currency"), extras.getString("amount")
+                                , extras.getString("toAccountNo"), extras.getString("description"));
+                    }
+                    else {
+                        new commitFunCall().execute("bwAccounts", url, extras.getString("RefNo"), extras.getString("transType"), extras.getString("fromAccountNo"), extras.getString("Currency"), extras.getString("amount")
+                                , extras.getString("toAccountNo"), extras.getString("description"));
+                    }
                 }
             });
         }
@@ -180,11 +181,11 @@ public class ConfirmPage extends AppCompatActivity {
 
             getSupportActionBar().setTitle("Confirm Transfer");
             t6.setVisibility(View.GONE);
-            t1.setText("From Account");
-            t2.setText("To Account");
-            t3.setText("Description");
-            t4.setText("Amount");
-            t5.setText("Nick Name");
+            t1.setText(R.string.from_account);
+            t2.setText(R.string.to_account);
+            t3.setText(R.string.desc);
+            t4.setText(R.string.amt);
+            t5.setText(R.string.nick_name);
             frmAcct.setText(extras.getString("fromAccountNo"));
             toAcct.setText(extras.getString("toAccountNo"));
             des.setText(extras.getString("description"));
@@ -197,9 +198,22 @@ public class ConfirmPage extends AppCompatActivity {
 
                 @Override
                 public void onClick(View arg0) {
-                        String url = "http://10.93.22.116:9089/Test-iris/Test.svc/GB0010001/verFundsTransfer_AcTranss()/input";
-                        new commitFunCall().execute("account",url,extras.getString("RefNo"),extras.getString("transType"),extras.getString("fromAccountNo"),extras.getString("Currency"),extras.getString("amount")
-                                ,extras.getString("toAccountNo"),extras.getString("description"));
+                    URLRelated urlObj = new URLRelated(getApplicationContext());
+                    String[] URLAddressList = {"url_ip", "url_iris_project", "url_company", "url_verFundsTransfer_AcTranss_input"};
+                    String url = urlObj.getURL(URLAddressList);
+                    String refNo=extras.getString("RefNo");
+                    String transType=extras.getString("transType");
+                    String fromAccountNo=extras.getString("fromAccountNo");
+                    String Currency= extras.getString("Currency");
+                    String amount= extras.getString("amount");
+                    String toAccountNo= extras.getString("toAccountNo");
+                    String description= extras.getString("description");
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                        new commitFunCall().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "withinBank", url, extras.getString("RefNo"), extras.getString("transType"), extras.getString("fromAccountNo"), extras.getString("Currency"), extras.getString("amount"), extras.getString("toAccountNo"), extras.getString("description"));
+                    }else {
+                        new commitFunCall().execute("withinBank", url, extras.getString("RefNo"), extras.getString("transType"), extras.getString("fromAccountNo"), extras.getString("Currency"), extras.getString("amount"), extras.getString("toAccountNo"), extras.getString("description"));
+                    }
+
 
                 }
             });
@@ -215,13 +229,13 @@ public class ConfirmPage extends AppCompatActivity {
             TextView sortCode= (TextView) findViewById(R.id.editText20);
             TextView bName = (TextView) findViewById(R.id.editText8);
 
-            t1.setText("From Account");
-            t2.setText("To Account");
-            t3.setText("Description");
-            t4.setText("Amount");
-            t5.setText("Branch Name");
-            t6.setText("Nick Name");
-            t7.setText("Bank Sort Code");
+            t1.setText(R.string.from_account);
+            t2.setText(R.string.to_account);
+            t3.setText(R.string.desc);
+            t4.setText(R.string.amt);
+            t5.setText(R.string.branch_name);
+            t6.setText(R.string.nick_name);
+            t7.setText(R.string.bank_sort_code);
             frmAcct.setText(extras.getString("fromAccountNo"));
             toAcct.setText(extras.getString("toAccountNo"));
             des.setText(extras.getString("description"));
@@ -236,13 +250,26 @@ public class ConfirmPage extends AppCompatActivity {
 
                 @Override
                 public void onClick(View arg0) {
-                    String url = "http://10.93.22.116:9089/Test-iris/Test.svc/GB0010001/verFundsTransfer_AcTransObnks()/input";
-                    new commitFunCall().execute("other", url, extras.getString("RefNo"), extras.getString("transType"),
-                            extras.getString("bankSortCode"), extras.getString("toAccountNo"),
-                            extras.getString("benCustomer"), extras.getString("branchName"),
-                            extras.getString("creAcctNo"), extras.getString("fromAccountNo"),
-                            extras.getString("amount"), extras.getString("Currency"),
-                            extras.getString("description"));
+
+                    URLRelated urlObj = new URLRelated(getApplicationContext());
+                    String[] URLAddressList = {"url_ip", "url_iris_project", "url_company", "url_verFundsTransfer_AcTransObnks_input"};
+                    String url = urlObj.getURL(URLAddressList);
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                        new commitFunCall().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,"others", url, extras.getString("RefNo"), extras.getString("transType"),
+                                extras.getString("bankSortCode"), extras.getString("toAccountNo"),
+                                extras.getString("benCustomer"), extras.getString("branchName"),
+                                extras.getString("creAcctNo"), extras.getString("fromAccountNo"),
+                                extras.getString("amount"), extras.getString("Currency"),
+                                extras.getString("description"));
+                    }
+                    else {
+                        new commitFunCall().execute("others", url, extras.getString("RefNo"), extras.getString("transType"),
+                                extras.getString("bankSortCode"), extras.getString("toAccountNo"),
+                                extras.getString("benCustomer"), extras.getString("branchName"),
+                                extras.getString("creAcctNo"), extras.getString("fromAccountNo"),
+                                extras.getString("amount"), extras.getString("Currency"),
+                                extras.getString("description"));
+                    }
                 }
             });
         }
@@ -258,8 +285,9 @@ public class ConfirmPage extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public class commitFunCall extends AsyncTask<String,Void,Boolean>
+    private class commitFunCall extends AsyncTask<String,Void,Boolean>
     {
+
         @Override
         protected void onPreExecute() {
             progressDialog= new ProgressDialog(ConfirmPage.this);
@@ -272,7 +300,7 @@ public class ConfirmPage extends AppCompatActivity {
         protected Boolean doInBackground(String... params)
         {
             try {
-                String json = "";
+                String json;
                 JSONObject jsonObject = new JSONObject();
                 if(params[0].equals("withinBank") || params[0].equals("bwAccounts")) {
 
@@ -313,19 +341,18 @@ public class ConfirmPage extends AppCompatActivity {
 
                 HttpHandler newObj = new HttpHandler();
                 status = newObj.posCommit(params[1], json);
-                if(status.equals("YES")) {
-                    return true;
-                }
-                else
-                {
-                  return false;
-                }
+
             }catch (Exception e) {
                 e.printStackTrace();
             }
-            return true;
+            return status.equals("YES");
         }
         protected void onPostExecute(Boolean aBoolean) {
+            HttpHandler errorObj;
+            String text, info;
+
+            HashMap<String, HashMap<String, String>> errorList;
+            HashMap<String, String> error;
             if(aBoolean){
                 progressDialog.dismiss();
                 final Intent TransferBwAccounts = new Intent(ConfirmPage.this, SucessPage.class);
@@ -336,8 +363,35 @@ public class ConfirmPage extends AppCompatActivity {
                 startActivity(TransferAccounts);
             }
             else{
-                final Intent TransferBwAccounts = new Intent(ConfirmPage.this, ConfirmPage.class);
-                startActivity(TransferBwAccounts);
+                // changed----------------------------
+                progressDialog.dismiss();
+                errorObj = new HttpHandler();
+                errorList = errorObj.getErrorList();
+                errorMessage= new String[errorList.size()];
+                for (int i = 0; i < errorList.size(); i++) {
+                    error = errorList.get("Error" + i);
+                    text = error.get("text");
+                    info = error.get("info");//field
+                    errorMessage[i]=text;
+
+                }
+                for(int i=0;i<errorList.size();i++)
+                {
+                    String[] errorList1 = errorMessage[i].split("\\(");
+                    new AlertDialog.Builder(ConfirmPage.this)
+                            .setTitle("Error")
+                            .setMessage(errorList1[0])
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // continue with delete
+
+                                }
+                            })
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .show();
+
+                }
+                //--------------------------------
             }
         }
     }
@@ -347,6 +401,11 @@ public class ConfirmPage extends AppCompatActivity {
 
         @Override
         protected void onPreExecute() {
+            super.onPreExecute();
+            preprogressDialog= new ProgressDialog(ConfirmPage.this);
+            preprogressDialog.setMessage("Please wait...");
+           preprogressDialog.show();
+            preprogressDialog.setCancelable(false);
             super.onPreExecute();
         }
         public Commit(HashMap<String, String> obj )
@@ -358,12 +417,16 @@ public class ConfirmPage extends AppCompatActivity {
             HttpHandler sh = new HttpHandler();
             String url;
             try {
+                URLRelated urlObj = new URLRelated(getApplicationContext());
                 PropertiesReader property = new PropertiesReader();
-                if (imp.equals("external"))
-                    url = property.getProperty("url_beneficiary_Obnk_Input", getApplicationContext());
-                else
-                    url = property.getProperty("url_beneficiary_Wbnk_Input", getApplicationContext());
-
+                if (imp.equals("external")) {
+                    String[] URLAddressList = {"url_ip", "url_iris_project", "url_company", "url_beneficiary_Obnk_Input"};
+                    url = urlObj.getURL(URLAddressList);
+                }
+                else {
+                    String[] URLAddressList = {"url_ip", "url_iris_project", "url_company", "url_beneficiary_Wbnk_Input"};
+                    url = urlObj.getURL(URLAddressList);
+                }
 
                 String BenAcctNo = obj1.get("BenAcctNo");
                 String BencustomerNo = obj1.get("BenCustomer");
@@ -375,8 +438,11 @@ public class ConfirmPage extends AppCompatActivity {
                 JSONObject jsonObjarray = new JSONObject();
                 JSONObject postdata = new JSONObject();
                 JSONArray array = new JSONArray();
-
-
+                String owningCustomer;
+                HashMap<String,String> owner;
+                SessionManager session =new SessionManager(getApplicationContext());
+                owner=session.getUserDetails();
+                owningCustomer= owner.get("cusId");
                 if (imp.equals("external")) {
 
                     postdata.put("BenAcctNo", BenAcctNo);
@@ -387,8 +453,7 @@ public class ConfirmPage extends AppCompatActivity {
                     jsonObjarray.put("Nickname", Nickname);
                     array.put(jsonObjarray);
                     postdata.put("NicknameMvGroup", array);
-                    postdata.put("OwningCustomer", "190090");
-
+                    postdata.put("OwningCustomer", owningCustomer );
                 } else {
                     postdata.put("BenAcctNo", BenAcctNo);
                     postdata.put("BenCustomer", BencustomerNo);
@@ -397,15 +462,13 @@ public class ConfirmPage extends AppCompatActivity {
                     jsonObjarray.put("Nickname", Nickname);
                     array.put(jsonObjarray);
                     postdata.put("NicknameMvGroup", array);
-                    postdata.put("OwningCustomer", "190090");
+                    postdata.put("OwningCustomer",owningCustomer );
                 }
 
 
                 success = sh.jsonWrite(url, postdata);
 
             } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
                 e.printStackTrace();
             }
             return null;
@@ -415,7 +478,13 @@ public class ConfirmPage extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void result){
             super.onPostExecute(result);
+            HttpHandler errorObj;
+            String text, info;
+
+            HashMap<String, HashMap<String, String>> errorList;
+            HashMap<String, String> error;
             if(success) {
+                preprogressDialog.dismiss();
                 final Intent AddBeneficiary = new Intent(ConfirmPage.this, SucessPage.class);
 
                 AddBeneficiary.putExtra("Sucess","Ben");
@@ -424,7 +493,36 @@ public class ConfirmPage extends AppCompatActivity {
             }
             else
             {
-                Toast.makeText(ConfirmPage.this, "error in connection ", Toast.LENGTH_LONG).show();
+//                Toast.makeText(ConfirmPage.this, "error in connection ", Toast.LENGTH_LONG).show();
+                preprogressDialog.dismiss();
+                errorObj = new HttpHandler();
+                errorList = errorObj.getErrorList();
+                errorMessage= new String[errorList.size()];
+                for (int i = 0; i < errorList.size(); i++) {
+                    error = errorList.get("Error" + i);
+                    text = error.get("text");
+                    info = error.get("info");//field
+                    errorMessage[i]=text;
+                }
+                for(int i=0;i<errorList.size();i++)
+                {
+                    String[] errorList1 = errorMessage[i].split("\\(");
+                    new AlertDialog.Builder(ConfirmPage.this)
+
+                            .setTitle("Error")
+                            .setMessage(errorList1[0])
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // continue with delete
+
+                                }
+                            })
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .show();
+
+                }
+                errorMessage=null;
+
             }
         }
 

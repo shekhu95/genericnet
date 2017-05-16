@@ -4,7 +4,6 @@ package com.temenos.dshubhamrajput.genericnet;
  * Created by ckavya on 03-03-2017.
  */
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 public class ExpandableListDataPump {
@@ -34,15 +33,19 @@ public class ExpandableListDataPump {
 
         List<String> Logout = new ArrayList<String>();
 
+        List<String> qrCode = new ArrayList<>();
 
+        List<String> qrGenerator = new ArrayList<>();
 
 
         expandableListDetail.put("Account Summary", Account_Summary);
         expandableListDetail.put("Account Statement", Account_Statement);
         expandableListDetail.put("Account Transfer", Account_Transfer);
-        expandableListDetail.put("Settings", Settings);
-        expandableListDetail.put("Feedback", Feedback);
+        expandableListDetail.put("Generate QR Code",qrGenerator);
+        expandableListDetail.put("Scan QR Code",qrCode);
+        expandableListDetail.put("Reset Password", Settings);
         expandableListDetail.put("Help", Help);
+        expandableListDetail.put("Feedback", Feedback);
         expandableListDetail.put("Logout", Logout);
 
 
